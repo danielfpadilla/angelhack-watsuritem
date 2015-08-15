@@ -31,6 +31,14 @@ class Order_Model extends CI_Model {
         $cps_simple->insertSingle(uniqid(), get_object_vars($this));
     }
     /**
+     * Update
+     * Description
+     */
+    public function update()
+    {
+        
+    }
+    /**
      * Instantiate
      * Description
      */
