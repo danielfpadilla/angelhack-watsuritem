@@ -36,4 +36,14 @@ class Clusterpoint {
             $this->api = new CPS_Simple($this->connection);
         }
     }
+    
+    public function ordering($tag = NULL, $lang = "en", $order = NULL)
+    {
+        return CPS_StringOrdering($tag, $lang, $order);
+    }
+    
+    public function term($term = NULL, $xpath = NULL, $escape = TRUE)
+    {
+        return CPS_Term($term, $xpath, $escape);
+    }
 }

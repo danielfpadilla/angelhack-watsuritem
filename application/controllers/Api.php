@@ -6,16 +6,38 @@ class Api extends REST_Controller {
      * Customer Login
      * Description
      */
-    public function customer_login_get()
+    public function customer_get()
     {
-        $this->response($this->get());
     }
     /**
-     * 
+     * Register Customer
+     * Description
+     */
+    public function customer_post()
+    {
+        $this->load->model("Customer_Model");
+        
+        $customer = new $this->Customer_Model;
+        
+        $customer->instantiate($this->post());
+        $id = $order->register();
+        
+        $this->response(array("status" => "success", "id" => $id));
+    }
+    /**
+     * Get Order
+     * Description
      */
     public function order_get()
     {
+        $this->load->model("Order_Model");
         
+        if( array_key_exists("id", $this->get()) )
+        {
+            $order = $this->Order_Model->get_by_id($this->get("id"));
+        
+            $this->response(array("status" => "success", "order" => $order));
+        }
     }
     /**
      * Create Order
@@ -65,5 +87,16 @@ class Api extends REST_Controller {
             $order->delete();
         }
     }
+    /**
+     * Get Orders
+     * Description
+     */
+    public function orders_get()
+    {
+        $this->load->model("Order_Model");
+        
+        $orders = $this->Order_Model->get($this->get());
+    
+        $this->response(array("status" => "success", "orders" => $orders));
+    }
 }
-?>
