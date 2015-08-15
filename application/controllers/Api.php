@@ -11,6 +11,13 @@ class Api extends REST_Controller {
         $this->response($this->get());
     }
     /**
+     * 
+     */
+    public function order_get()
+    {
+        
+    }
+    /**
      * Create Order
      * Description
      */
@@ -20,20 +27,7 @@ class Api extends REST_Controller {
         
         $order = new $this->Order_Model;
         
-        $order->instantiate(array(
-    "title" => "Hello Angelhack", 
-    "date" => "2015-08-15",  
-    "items" => array(
-            array(
-                    "quantity" => 1,
-                     "description" => "Redbull"
-            ),  
-            array(
-                    "quantity" => 1, 
-                    "description" => "pizza"
-            )
-    )
-));
+        $order->instantiate($this->post());
         $id = $order->register();
     
         $this->response(array("status" => "success", "id" => $id));
@@ -49,27 +43,27 @@ class Api extends REST_Controller {
             $this->load->model("Order_Model");
             $order = new $this->Order_Model;
             
-            $order->instantiate(array(
-    "title" => "Hello Angelhack Davao 2015", 
-    "date" => "2015-08-15",  
-    "items" => array(
-            array(
-                    "quantity" => 1,
-                     "description" => "Redbull++"
-            ),  
-            array(
-                    "quantity" => 1, 
-                    "description" => "Pizza Much"
-            )
-    )
-));
-        $order->id = $this->get("id");
+            $order->instantiate($this->put());
+            $order->id = $this->get("id");
         
-        $order->update();
+            $order->update();
         }
-        
-        
-        
+    }
+    /**
+     * Delete Order
+     * Description
+     */
+    public function order_delete()
+    {
+        if( array_key_exists("id", $this->get()) )
+        {
+            $this->load->modal("Order_Model");
+            
+            $order = new $this->Order_Model;
+            
+            $order->id = $this->get("id");
+            $order->delete();
+        }
     }
 }
 ?>

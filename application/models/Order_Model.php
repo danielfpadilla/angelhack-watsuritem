@@ -50,6 +50,18 @@ class Order_Model extends CI_Model {
         }
     }
     /**
+     * Delete
+     * Description
+     */
+    public function delete()
+    {
+        if($this->id)
+        {
+            $this->clusterpoint->connect();
+            $this->clusterpoint->api->delete($this->id);
+        }
+    }
+    /**
      * Instantiate
      * Description
      */
