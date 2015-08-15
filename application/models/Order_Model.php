@@ -1,6 +1,6 @@
 <?php
 class Order_Model extends CI_Model {
-    public $customer_id = NULL;
+    public $status = 0;
     
     public $title = NULL;
     
@@ -29,12 +29,18 @@ class Order_Model extends CI_Model {
         {
             $documents = (array_key_exists("get", $arguments)) ? $arguments["get"] : 20;
             $offset = (array_key_exists("starting", $arguments)) ? $arguments["starting"] : 0;
-            $ordering = (array_key_exists("order", $arguments)) ? $arguments["order"] : "descending";
-            $ordering = $this->clusterpoint->ordering("date", "en", $ordering);
+            $order = (array_key_exists("order", $arguments)) ? $arguments["order"] : "descending";
+            $tag = (array_key_exists("tag", $arguments)) ? $arguments["tag"] : "date";
+            $ordering = $this->clusterpoint->ordering($tag, "en", $order);
             
             $query = "*";
             if(array_key_exists("customer", $arguments))
                 $query = $this->clusterpoint->term($arguments["customer"], "//customer/id");
+            else if(array_key_exists("assistant", $arguments))
+                $query = $this->clusterpoint->term($arguments["assistant"], "//assistant/id");
+            
+            if(array_key_exists("complete", $arguments))
+                $query .= $this->clusterpoint->term($arguments["complete"], "//status");
             
             $documents = $this->clusterpoint->api->search($query, $offset, $documents, array(), $ordering);
             
@@ -65,26 +71,6 @@ class Order_Model extends CI_Model {
         }
         
         return $document;
-    }
-    /**
-     * Get By Customer
-     * Description
-     */
-    public function get_by_customer($customer_id = NULL, $documents = 20, $starting = 0, $ordering = "descending")
-    {
-        $this->clusterpoint->connect();
-        
-        try
-        {
-            $query = $this->clusterpoint->term("55cf3825baa38", "//document/customer/id");
-            $documents = $this->clusterpoint->api->search($query, $starting, $documents, array(), $ordering);
-            
-            return $documents;
-        }
-        catch(CPS_Exception $e)
-        {
-            throw $e;
-        }
     }
     /**
      * Register

@@ -1,7 +1,24 @@
 <?php 
-require(APPPATH."/libraries/REST_Controller.php");
- 
+require(APPPATH . "/libraries/REST_Controller.php");
+
+error_reporting(0);
+
 class Api extends REST_Controller {
+    /**
+     * Get Assistant
+     * Description
+     */
+    public function assistant_get()
+    {
+        $this->load->model("Assistant_Model");
+        
+        if( array_key_exists("code", $this->get()) )
+        {
+            $assistant = $this->Assistant_Model->get_by_code($this->get("code"));
+            
+            $this->response(array("status" => "success", "assistant" => $assistant));
+        }
+    }
     /**
      * Customer Login
      * Description
@@ -68,6 +85,9 @@ class Api extends REST_Controller {
             $order->instantiate($this->put());
             $order->id = $this->get("id");
         
+            if( array_key_exists("assistant", $this->put()) )
+                $this->assistant = $this->put("assistant");
+        
             $order->update();
         }
     }
@@ -98,5 +118,10 @@ class Api extends REST_Controller {
         $orders = $this->Order_Model->get($this->get());
     
         $this->response(array("status" => "success", "orders" => $orders));
+    }
+    
+    public function unique_get()
+    {
+        echo uniqid();
     }
 }
