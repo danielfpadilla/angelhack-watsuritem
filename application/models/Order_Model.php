@@ -1,34 +1,37 @@
 <?php
-require_once(APPPATH . "/third_party/clusterpoint/cps_simple.php");
-
 class Order_Model extends CI_Model {
     public $title = NULL;
     
     public $date = "";
     
     public $items = array();
+    public function __construct()
+    {
+        parent::__construct();
+        
+        $this->load->library("Clusterpoint");
+    }
     /**
      * Register
      * Description
      */
     public function register()
     {
-        $this->load->config("clusterpoint");
+        $this->clusterpoint->connect();
         
-        $cps_conn = new CPS_Connection(
-            new CPS_LoadBalancer($this->config->item("connection_strings")),
-            $this->config->item("database"),
-            "USERNAME",
-            "PASSWORD",
-            $this->config->item("document_root_xpath"),
-            $this->config->item("document_id_xpath"),
-            array("account" => $this->config->item("account"))
-        );
+        $id = uniqid();
         
-        $cps_conn->setHMACKeys($this->config->item("user_key"), $this->config->item("sign_key"));
+        try
+        {
+            $document = get_object_vars($this);
+            $this->clusterpoint->api->insertSingle($id, $document);
+        }
+        catch(CPS_Exception $e)
+        {
+            throw $e;
+        }
         
-        $cps_simple = new CPS_Simple($cps_conn);
-        $cps_simple->insertSingle(uniqid(), get_object_vars($this));
+        return $id;
     }
     /**
      * Update
@@ -36,7 +39,15 @@ class Order_Model extends CI_Model {
      */
     public function update()
     {
-        
+        if($this->id)
+        {
+            $this->clusterpoint->connect();
+            $document = get_object_vars($this);
+            
+            unset($document["id"]);
+            
+            $this->clusterpoint->api->updateSingle($this->id, $document);
+        }
     }
     /**
      * Instantiate
