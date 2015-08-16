@@ -4,6 +4,19 @@ require(APPPATH . "/libraries/REST_Controller.php");
 error_reporting(0);
 
 class Api extends REST_Controller {
+    
+    public function __construct()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        $method = $_SERVER['REQUEST_METHOD'];
+        
+        if($method == "OPTIONS")
+            die();
+        
+        parent::__construct();
+    }
     /**
      * Get Assistant
      * Description
@@ -25,6 +38,14 @@ class Api extends REST_Controller {
      */
     public function customer_get()
     {
+        if( array_key_exists("id", $this->get()) )
+        {
+            $this->load->model("Customer_Model");
+            
+            $customer = $this->Customer_Model->get_by_id($this->get("id"));
+        
+            $this->response(array("status" => "success", "customer" => $customer));
+        }
     }
     /**
      * Register Customer
@@ -37,9 +58,9 @@ class Api extends REST_Controller {
         $customer = new $this->Customer_Model;
         
         $customer->instantiate($this->post());
-        $id = $order->register();
+        $customer->register();
         
-        $this->response(array("status" => "success", "id" => $id));
+        $this->response( array("status" => "success", "id" => $this->post("id")) );
     }
     /**
      * Get Order
@@ -67,6 +88,10 @@ class Api extends REST_Controller {
         $order = new $this->Order_Model;
         
         $order->instantiate($this->post());
+        
+        if( array_key_exists("customer", $this->post()) )
+            $order->customer = $this->post("customer");
+            
         $id = $order->register();
     
         $this->response(array("status" => "success", "id" => $id));
@@ -99,7 +124,7 @@ class Api extends REST_Controller {
     {
         if( array_key_exists("id", $this->get()) )
         {
-            $this->load->modal("Order_Model");
+            $this->load->model("Order_Model");
             
             $order = new $this->Order_Model;
             

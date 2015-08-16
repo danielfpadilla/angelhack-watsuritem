@@ -1,0 +1,37 @@
+body{
+	margin: 0;
+	background-color: #fff;
+
+}
+.left-pane{
+	background-color: #edfafb;
+}
+.right-pain{
+	background-color: #ededed;
+}
+.order{
+	background-color: #fff;
+}
+.date{
+	font-size: 40px;
+}
+.moyr{
+	line-height: 20%;
+}
+.today{
+	margin-top: 20px;
+	color: #424242;	
+	font-size: 15px;
+}
+.month{
+	
+	color: #757575;
+	font-size: 13px;
+}
+.details{
+
+}
+.name{
+	color: #424242;
+	font-size: 30px;
+}

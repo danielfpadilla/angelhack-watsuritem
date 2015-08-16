@@ -1,12 +1,14 @@
 <?php
 class Order_Model extends CI_Model {
-    public $status = 0;
+    public $status = "PENDING";
     
     public $title = NULL;
     
     public $date = "";
     
     public $items = array();
+    
+    public $archive = 0;
     /**
      * Class Constructor
      * Description
@@ -33,14 +35,15 @@ class Order_Model extends CI_Model {
             $tag = (array_key_exists("tag", $arguments)) ? $arguments["tag"] : "date";
             $ordering = $this->clusterpoint->ordering($tag, "en", $order);
             
-            $query = "*";
+            $query = $this->clusterpoint->term("0", "//archive");
+            
             if(array_key_exists("customer", $arguments))
                 $query = $this->clusterpoint->term($arguments["customer"], "//customer/id");
             else if(array_key_exists("assistant", $arguments))
                 $query = $this->clusterpoint->term($arguments["assistant"], "//assistant/id");
             
-            if(array_key_exists("complete", $arguments))
-                $query .= $this->clusterpoint->term($arguments["complete"], "//status");
+            if(array_key_exists("status", $arguments))
+                $query .= $this->clusterpoint->term($arguments["status"], "//status");
             
             $documents = $this->clusterpoint->api->search($query, $offset, $documents, array(), $ordering);
             
@@ -84,6 +87,7 @@ class Order_Model extends CI_Model {
         
         try
         {
+            $this->date = time();
             $document = get_object_vars($this);
             $this->clusterpoint->api->insertSingle($id, $document);
         }
@@ -105,9 +109,19 @@ class Order_Model extends CI_Model {
             $this->clusterpoint->connect();
             $document = get_object_vars($this);
             
-            unset($document["id"]);
-            
             $this->clusterpoint->api->updateSingle($this->id, $document);
+        }
+    }
+    /**
+     * Partial Update
+     * Description
+     */
+    public function partial_replace($document = array())
+    {
+        if(array_key_exists("id", $document))
+        {
+            $this->clusterpoint->connect();
+            $this->clusterpoint->api->partialReplaceSingle($document["id"], $document);
         }
     }
     /**
@@ -119,7 +133,9 @@ class Order_Model extends CI_Model {
         if($this->id)
         {
             $this->clusterpoint->connect();
-            $this->clusterpoint->api->delete($this->id);
+            $document = array("archive" => 1);
+            
+            $this->clusterpoint->api->partialReplaceSingle($this->id, $document);
         }
     }
     /**
